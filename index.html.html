@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Tenis Tracker</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 12px; background: #121212; color: #fff; touch-action: manipulation; }
+    h2 { margin: 10px 0 4px 0; font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-box { background: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; gap: 8px; }
+    input, select { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 6px; font-size: 14px; width: 100%; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+    button.btn {
+      background: #252525; border: 1px solid #3a3a3a; color: #fff; padding: 10px 4px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px;
+    }
+    button.btn:active { background: #3d3d3d; transform: scale(0.97); }
+    .count { font-size: 18px; font-weight: bold; margin-top: 2px; }
+    .btn-err { border-left: 4px solid #ef4444; }
+    .btn-win { border-left: 4px solid #22c55e; }
+    .btn-for { border-left: 4px solid #f59e0b; }
+    .btn-vol { border-left: 4px solid #06b6d4; }
+    .btn-saque-in { background: #14532d !important; border-color: #22c55e !important; font-size: 16px; }
+    .btn-saque-out { background: #7f1d1d !important; border-color: #ef4444 !important; font-size: 16px; }
+    .footer-bar { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .row-actions { display: flex; gap: 8px; }
+    .btn-action { background: #16a34a; color: #fff; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%; }
+    .btn-secondary { background: #2563eb; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; flex: 1; cursor: pointer; }
+    .btn-danger { background: #333; color: #f87171; border: 1px solid #444; padding: 10px; border-radius: 8px; font-size: 13px; flex: 1; cursor: pointer; }
+    .log-box { margin-top: 10px; background: #1a1a1a; border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #888; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <div class="header-box">
+    <input type="text" id="alumno" placeholder="Nombre Alumno (ej. Juan Perez)">
+    <input type="date" id="fecha">
+  </div>
+
+  <!-- ERRORES NO FORZADOS -->
+  <h2>Errores no forzados (Fondo)</h2>
+  <div class="grid-3">
+    <button class="btn btn-err" onclick="registrar('Drive','Error no forzado','Red')">D. Red <span class="count" id="c_D_Red">0</span></button>
+    <button class="btn btn-err" onclick="registrar('Drive','Error no forzado','Larga')">D. Larga <span class="count" id="c_D_Larga">0</span></button>
+    <button class="btn btn-err" onclick="registrar('Drive','Error no forzado','Ancha')">D. Ancha <span class="count" id="c_D_Ancha">0</span></button>
+  </div>
+  <div class="grid-3">
+    <button class="btn btn-err" onclick="registrar('Revés','Error no forzado','Red')">R. Red <span class="count" id="c_R_Red">0</span></button>
+    <button class="btn btn-err" onclick="registrar('Revés','Error no forzado','Larga')">R. Larga <span class="count" id="c_R_Larga">0</span></button>
+    <button class="btn btn-err" onclick="registrar('Revés','Error no forzado','Ancha')">R. Ancha <span class="count" id="c_R_Ancha">0</span></button>
+  </div>
+
+  <!-- WINNERS Y FORZADOS -->
+  <h2>Winners / Forzados</h2>
+  <div class="grid-3">
+    <button class="btn btn-win" onclick="registrar('Drive','Winner','')">Win Drive <span class="count" id="c_D_Win">0</span></button>
+    <button class="btn btn-win" onclick="registrar('Revés','Winner','')">Win Revés <span class="count" id="c_R_Win">0</span></button>
+    <button class="btn btn-win" onclick="registrar('Saque','Winner','')">Ace <span class="count" id="c_Ace">0</span></button>
+  </div>
+  <div class="grid-2">
+    <button class="btn btn-for" onclick="registrar('Drive','Error forzado','')">Forzado Drive <span class="count" id="c_D_For">0</span></button>
+    <button class="btn btn-for" onclick="registrar('Revés','Error forzado','')">Forzado Revés <span class="count" id="c_R_For">0</span></button>
+  </div>
+
+  <!-- VOLEAS -->
+  <h2>Voleas</h2>
+  <div class="grid-2">
+    <button class="btn btn-vol" onclick="registrar('Volea','Acierto','')">Volea Ganada <span class="count" id="c_Vol_In">0</span></button>
+    <button class="btn btn-vol" onclick="registrar('Volea','Error','')">Volea Errada <span class="count" id="c_Vol_Out">0</span></button>
+  </div>
+
+  <!-- SAQUE -->
+  <h2>Canasto de Saque</h2>
+  <div style="margin-bottom: 6px;">
+    <select id="tipoSaque">
+      <option value="1er saque">1er saque</option>
+      <option value="2do saque">2do saque</option>
+    </select>
+  </div>
+  <div class="grid-2">
+    <button class="btn btn-saque-in" onclick="registrarSaque(true)">SAQUE IN <span class="count" id="c_Saque_In">0</span></button>
+    <button class="btn btn-saque-out" onclick="registrarSaque(false)">SAQUE OUT <span class="count" id="c_Saque_Out">0</span></button>
+  </div>
+
+  <div class="log-box" id="log">Sesión iniciada</div>
+
+  <!-- BOTONES DE ACCIÓN -->
+  <div class="footer-bar">
+    <div class="row-actions">
+      <button class="btn-danger" onclick="deshacer()">Deshacer (1)</button>
+      <button class="btn-secondary" onclick="exportarCSV(false)">Solo Descargar CSV</button>
+    </div>
+    <button class="btn-action" onclick="terminarYReiniciar()">✓ GUARDAR Y NUEVO ALUMNO</button>
+  </div>
+
+  <script>
+    document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+
+    let historialPartidos = [];
+    let saques = { "1er saque": { in: 0, tot: 0 }, "2do saque": { in: 0, tot: 0 } };
+    let ultimasAcciones = [];
+
+    function vibrar() {
+      if (navigator.vibrate) navigator.vibrate(35);
+    }
+
+    function registrar(golpe, resultado, zona) {
+      vibrar();
+      const item = {
+        alumno: document.getElementById('alumno').value.trim() || "Alumno",
+        fecha: document.getElementById('fecha').value,
+        instancia: "Entrenamiento",
+        golpe: golpe,
+        resultado: resultado,
+        zona: zona
+      };
+      historialPartidos.push(item);
+      ultimasAcciones.push({ tipo: 'partido', item: item });
+      actualizarPantalla(`${golpe} - ${resultado} ${zona ? '('+zona+')' : ''}`);
+    }
+
+    function registrarSaque(adentro) {
+      vibrar();
+      const tipo = document.getElementById('tipoSaque').value;
+      saques[tipo].tot++;
+      if (adentro) saques[tipo].in++;
+      ultimasAcciones.push({ tipo: 'saque', tipoSaque: tipo, adentro: adentro });
+      actualizarPantalla(`Saque ${tipo}: ${adentro ? 'IN' : 'OUT'}`);
+    }
+
+    function deshacer() {
+      if (ultimasAcciones.length === 0) return;
+      const ultima = ultimasAcciones.pop();
+      if (ultima.tipo === 'partido') {
+        historialPartidos.pop();
+      } else if (ultima.tipo === 'saque') {
+        saques[ultima.tipoSaque].tot--;
+        if (ultima.adentro) saques[ultima.tipoSaque].in--;
+      }
+      actualizarPantalla("Último tiro deshecho");
+    }
+
+    function actualizarPantalla(mensaje) {
+      document.getElementById('log').innerText = mensaje;
+
+      const contadores = {
+        c_D_Red: 0, c_D_Larga: 0, c_D_Ancha: 0,
+        c_R_Red: 0, c_R_Larga: 0, c_R_Ancha: 0,
+        c_D_Win: 0, c_R_Win: 0, c_Ace: 0,
+        c_D_For: 0, c_R_For: 0,
+        c_Vol_In: 0, c_Vol_Out: 0
+      };
+
+      historialPartidos.forEach(p => {
+        if (p.golpe === 'Drive' && p.resultado === 'Error no forzado') {
+          if (p.zona === 'Red') contadores.c_D_Red++;
+          if (p.zona === 'Larga') contadores.c_D_Larga++;
+          if (p.zona === 'Ancha') contadores.c_D_Ancha++;
+        } else if (p.golpe === 'Revés' && p.resultado === 'Error no forzado') {
+          if (p.zona === 'Red') contadores.c_R_Red++;
+          if (p.zona === 'Larga') contadores.c_R_Larga++;
+          if (p.zona === 'Ancha') contadores.c_R_Ancha++;
+        } else if (p.resultado === 'Winner') {
+          if (p.golpe === 'Drive') contadores.c_D_Win++;
+          if (p.golpe === 'Revés') contadores.c_R_Win++;
+          if (p.golpe === 'Saque') contadores.c_Ace++;
+        } else if (p.resultado === 'Error forzado') {
+          if (p.golpe === 'Drive') contadores.c_D_For++;
+          if (p.golpe === 'Revés') contadores.c_R_For++;
+        } else if (p.golpe === 'Volea') {
+          if (p.resultado === 'Acierto') contadores.c_Vol_In++;
+          if (p.resultado === 'Error') contadores.c_Vol_Out++;
+        }
+      });
+
+      for (let k in contadores) {
+        document.getElementById(k).innerText = contadores[k];
+      }
+
+      const tipoActivo = document.getElementById('tipoSaque').value;
+      document.getElementById('c_Saque_In').innerText = saques[tipoActivo].in;
+      document.getElementById('c_Saque_Out').innerText = (saques[tipoActivo].tot - saques[tipoActivo].in);
+    }
+
+    document.getElementById('tipoSaque').addEventListener('change', () => actualizarPantalla('Modo saque: ' + document.getElementById('tipoSaque').value));
+
+    function generarCSVString() {
+      const alumno = document.getElementById('alumno').value.trim() || "Alumno";
+      const fecha = document.getElementById('fecha').value;
+
+      let csv = "Alumno,Fecha,Instancia,Golpe,Resultado,Zona falla\n";
+      historialPartidos.forEach(p => {
+        csv += `"${alumno}","${p.fecha}","${p.instancia}","${p.golpe}","${p.resultado}","${p.zona}"\n`;
+      });
+
+      csv += "\nTABLA CANASTO SAQUE\nAlumno,Fecha,Tipo de saque,Tiros totales,Tiros adentro\n";
+      if (saques["1er saque"].tot > 0) {
+        csv += `"${alumno}","${fecha}","1er saque",${saques["1er saque"].tot},${saques["1er saque"].in}\n`;
+      }
+      if (saques["2do saque"].tot > 0) {
+        csv += `"${alumno}","${fecha}","2do saque",${saques["2do saque"].tot},${saques["2do saque"].in}\n`;
+      }
+      return csv;
+    }
+
+    function exportarCSV(silencioso = false) {
+      if (historialPartidos.length === 0 && saques["1er saque"].tot === 0 && saques["2do saque"].tot === 0) {
+        if (!silencioso) alert("No hay tiros registrados.");
+        return false;
+      }
+      const alumno = (document.getElementById('alumno').value.trim() || "Alumno").replace(/\s+/g, '_');
+      const ahora = new Date();
+      const horaStr = `${ahora.getHours()}h${String(ahora.getMinutes()).padStart(2, '0')}`;
+      const nombreArchivo = `${alumno}_${document.getElementById('fecha').value}_${horaStr}.csv`;
+
+      const csvContent = generarCSVString();
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = nombreArchivo;
+      a.click();
+      return true;
+    }
+
+    function terminarYReiniciar() {
+      const alumnoActual = document.getElementById('alumno').value.trim() || "el alumno actual";
+      const confirmar = confirm(`¿Guardar datos de ${alumnoActual} y reiniciar a cero para el próximo turno?`);
+      if (!confirmar) return;
+
+      // 1. Descarga el CSV con nombre y hora
+      exportarCSV(true);
+
+      // 2. Reiniciar variables
+      historialPartidos = [];
+      saques = { "1er saque": { in: 0, tot: 0 }, "2do saque": { in: 0, tot: 0 } };
+      ultimasAcciones = [];
+
+      // 3. Limpiar campo alumno
+      document.getElementById('alumno').value = "";
+      actualizarPantalla("Listo para el siguiente alumno");
+    }
+  </script>
+</body>
+</html>
