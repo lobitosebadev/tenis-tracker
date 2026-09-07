@@ -191,17 +191,18 @@
       const alumno = document.getElementById('alumno').value.trim() || "Alumno";
       const fecha = document.getElementById('fecha').value;
 
-      let csv = "Alumno,Fecha,Instancia,Golpe,Resultado,Zona falla\n";
+      // BOM UTF-8 (\uFEFF) para forzar tildes en Excel y separador ';' para Excel en español
+      let csv = "\uFEFFsep=;\nAlumno;Fecha;Instancia;Golpe;Resultado;Zona falla\n";
       historialPartidos.forEach(p => {
-        csv += `"${alumno}","${p.fecha}","${p.instancia}","${p.golpe}","${p.resultado}","${p.zona}"\n`;
+        csv += `"${alumno}";"${p.fecha}";"${p.instancia}";"${p.golpe}";"${p.resultado}";"${p.zona}"\n`;
       });
 
-      csv += "\nTABLA CANASTO SAQUE\nAlumno,Fecha,Tipo de saque,Tiros totales,Tiros adentro\n";
+      csv += "\nTABLA CANASTO SAQUE\nAlumno;Fecha;Tipo de saque;Tiros totales;Tiros adentro\n";
       if (saques["1er saque"].tot > 0) {
-        csv += `"${alumno}","${fecha}","1er saque",${saques["1er saque"].tot},${saques["1er saque"].in}\n`;
+        csv += `"${alumno}";"${fecha}";"1er saque";${saques["1er saque"].tot};${saques["1er saque"].in}\n`;
       }
       if (saques["2do saque"].tot > 0) {
-        csv += `"${alumno}","${fecha}","2do saque",${saques["2do saque"].tot},${saques["2do saque"].in}\n`;
+        csv += `"${alumno}";"${fecha}";"2do saque";${saques["2do saque"].tot};${saques["2do saque"].in}\n`;
       }
       return csv;
     }
@@ -231,15 +232,12 @@
       const confirmar = confirm(`¿Guardar datos de ${alumnoActual} y reiniciar a cero para el próximo turno?`);
       if (!confirmar) return;
 
-      // 1. Descarga el CSV con nombre y hora
       exportarCSV(true);
 
-      // 2. Reiniciar variables
       historialPartidos = [];
       saques = { "1er saque": { in: 0, tot: 0 }, "2do saque": { in: 0, tot: 0 } };
       ultimasAcciones = [];
 
-      // 3. Limpiar campo alumno
       document.getElementById('alumno').value = "";
       actualizarPantalla("Listo para el siguiente alumno");
     }
