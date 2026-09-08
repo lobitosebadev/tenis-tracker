@@ -2,245 +2,291 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Tenis Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Planilla Tenis Coach</title>
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; padding: 12px; background: #121212; color: #fff; touch-action: manipulation; }
-    h2 { margin: 10px 0 4px 0; font-size: 13px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
-    .header-box { background: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; gap: 8px; }
-    input, select { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 6px; font-size: 14px; width: 100%; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-    button.btn {
-      background: #252525; border: 1px solid #3a3a3a; color: #fff; padding: 10px 4px; border-radius: 8px;
-      font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px;
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --green: #10b981;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --orange: #f59e0b;
+      --purple: #8b5cf6;
     }
-    button.btn:active { background: #3d3d3d; transform: scale(0.97); }
-    .count { font-size: 18px; font-weight: bold; margin-top: 2px; }
-    .btn-err { border-left: 4px solid #ef4444; }
-    .btn-win { border-left: 4px solid #22c55e; }
-    .btn-for { border-left: 4px solid #f59e0b; }
-    .btn-vol { border-left: 4px solid #06b6d4; }
-    .btn-saque-in { background: #14532d !important; border-color: #22c55e !important; font-size: 16px; }
-    .btn-saque-out { background: #7f1d1d !important; border-color: #ef4444 !important; font-size: 16px; }
-    .footer-bar { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
-    .row-actions { display: flex; gap: 8px; }
-    .btn-action { background: #16a34a; color: #fff; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%; }
-    .btn-secondary { background: #2563eb; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 13px; flex: 1; cursor: pointer; }
-    .btn-danger { background: #333; color: #f87171; border: 1px solid #444; padding: 10px; border-radius: 8px; font-size: 13px; flex: 1; cursor: pointer; }
-    .log-box { margin-top: 10px; background: #1a1a1a; border-radius: 8px; padding: 8px 10px; font-size: 12px; color: #888; text-align: center; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); padding: 12px; padding-bottom: 90px; }
+
+    /* Navegación pestañas */
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .tab-btn { background: var(--card); color: var(--text-dim); border: 1px solid var(--border); padding: 10px; font-weight: 600; border-radius: 8px; font-size: 14px; }
+    .tab-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* Configuración de Alumnas */
+    .config-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+    .config-card label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px; }
+    .config-input { width: 100%; background: #0b1120; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; font-size: 13px; }
+
+    /* Barra selección rápida de alumna activa (Puntos) */
+    .students-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; }
+    .st-btn { background: var(--card); border: 2px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .st-btn.active { background: var(--purple); border-color: #a78bfa; color: white; }
+
+    /* Botonera de Juego */
+    .section-title { font-size: 12px; font-weight: bold; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
+    .grid-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+    .action-btn { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 6px; color: white; font-size: 13px; font-weight: 600; text-align: center; }
+    .action-btn:active { transform: scale(0.97); }
+    .btn-win { background: #064e3b; border-color: var(--green); color: #6ee7b7; }
+    .btn-err { background: #450a0a; border-color: var(--red); color: #fca5a5; }
+
+    /* Menú flotante de zona de error */
+    .error-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+    .error-modal.show { display: flex; }
+    .modal-content { background: var(--card); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 320px; padding: 16px; text-align: center; }
+    .modal-content h3 { font-size: 15px; margin-bottom: 12px; }
+    .zones-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .zone-btn { background: #262626; border: 1px solid #404040; color: white; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; }
+    .zone-btn:active { background: var(--red); }
+
+    /* Canasto Saque */
+    .serve-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; }
+    .serve-name { grid-column: span 2; font-size: 15px; font-weight: bold; color: #38bdf8; display: flex; justify-content: space-between; }
+    .serve-box { background: #0b1120; border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; }
+    .serve-box .count { font-size: 18px; font-weight: 800; margin: 4px 0; }
+    .btn-serve-add { width: 100%; background: #065f46; border: 1px solid var(--green); color: white; padding: 8px 0; border-radius: 6px; font-weight: bold; font-size: 13px; }
+    .btn-serve-add:active { background: var(--green); }
+
+    /* Barra inferior fija */
+    .footer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #020617; border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 8px; z-index: 50; }
+    .btn-exp { flex: 2; background: var(--green); color: black; border: none; font-weight: bold; padding: 12px; border-radius: 8px; font-size: 13px; }
+    .btn-reset { flex: 1; background: #334155; color: white; border: none; font-weight: bold; padding: 12px; border-radius: 8px; font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
-  <div class="header-box">
-    <input type="text" id="alumno" placeholder="Nombre Alumno (ej. Juan Perez)">
-    <input type="date" id="fecha">
+  <!-- Selector de Vistas -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setTab('puntos')">Puntos / Juego</button>
+    <button class="tab-btn" onclick="setTab('saques')">Canasto Saque</button>
   </div>
 
-  <!-- ERRORES NO FORZADOS -->
-  <h2>Errores no forzados (Fondo)</h2>
-  <div class="grid-3">
-    <button class="btn btn-err" onclick="registrar('Drive','Error no forzado','Red')">D. Red <span class="count" id="c_D_Red">0</span></button>
-    <button class="btn btn-err" onclick="registrar('Drive','Error no forzado','Larga')">D. Larga <span class="count" id="c_D_Larga">0</span></button>
-    <button class="btn btn-err" onclick="registrar('Drive','Error no forzado','Ancha')">D. Ancha <span class="count" id="c_D_Ancha">0</span></button>
-  </div>
-  <div class="grid-3">
-    <button class="btn btn-err" onclick="registrar('Revés','Error no forzado','Red')">R. Red <span class="count" id="c_R_Red">0</span></button>
-    <button class="btn btn-err" onclick="registrar('Revés','Error no forzado','Larga')">R. Larga <span class="count" id="c_R_Larga">0</span></button>
-    <button class="btn btn-err" onclick="registrar('Revés','Error no forzado','Ancha')">R. Ancha <span class="count" id="c_R_Ancha">0</span></button>
+  <!-- Configuración rápida de alumnas -->
+  <div class="config-card">
+    <label>Alumnas presentes (separadas por coma):</label>
+    <input type="text" id="studentsInput" class="config-input" value="Martina, Sofia, Valentina, Camila" onchange="initApp()">
   </div>
 
-  <!-- WINNERS Y FORZADOS -->
-  <h2>Winners / Forzados</h2>
-  <div class="grid-3">
-    <button class="btn btn-win" onclick="registrar('Drive','Winner','')">Win Drive <span class="count" id="c_D_Win">0</span></button>
-    <button class="btn btn-win" onclick="registrar('Revés','Winner','')">Win Revés <span class="count" id="c_R_Win">0</span></button>
-    <button class="btn btn-win" onclick="registrar('Saque','Winner','')">Ace <span class="count" id="c_Ace">0</span></button>
-  </div>
-  <div class="grid-2">
-    <button class="btn btn-for" onclick="registrar('Drive','Error forzado','')">Forzado Drive <span class="count" id="c_D_For">0</span></button>
-    <button class="btn btn-for" onclick="registrar('Revés','Error forzado','')">Forzado Revés <span class="count" id="c_R_For">0</span></button>
-  </div>
+  <!-- VISTA 1: PUNTOS / AMERICANA -->
+  <div id="view-puntos" class="view active">
+    <div class="section-title">Alumna activa para la jugada:</div>
+    <div class="students-scroll" id="studentsContainer"></div>
 
-  <!-- VOLEAS -->
-  <h2>Voleas</h2>
-  <div class="grid-2">
-    <button class="btn btn-vol" onclick="registrar('Volea','Acierto','')">Volea Ganada <span class="count" id="c_Vol_In">0</span></button>
-    <button class="btn btn-vol" onclick="registrar('Volea','Error','')">Volea Errada <span class="count" id="c_Vol_Out">0</span></button>
-  </div>
-
-  <!-- SAQUE -->
-  <h2>Canasto de Saque</h2>
-  <div style="margin-bottom: 6px;">
-    <select id="tipoSaque">
-      <option value="1er saque">1er saque</option>
-      <option value="2do saque">2do saque</option>
-    </select>
-  </div>
-  <div class="grid-2">
-    <button class="btn btn-saque-in" onclick="registrarSaque(true)">SAQUE IN <span class="count" id="c_Saque_In">0</span></button>
-    <button class="btn btn-saque-out" onclick="registrarSaque(false)">SAQUE OUT <span class="count" id="c_Saque_Out">0</span></button>
-  </div>
-
-  <div class="log-box" id="log">Sesión iniciada</div>
-
-  <!-- BOTONES DE ACCIÓN -->
-  <div class="footer-bar">
-    <div class="row-actions">
-      <button class="btn-danger" onclick="deshacer()">Deshacer (1)</button>
-      <button class="btn-secondary" onclick="exportarCSV(false)">Solo Descargar CSV</button>
+    <div class="section-title">Tiros Ganadores (Winners)</div>
+    <div class="grid-actions">
+      <button class="action-btn btn-win" onclick="addPoint('Drive', 'Winner', '')">Drive W</button>
+      <button class="action-btn btn-win" onclick="addPoint('Revés', 'Winner', '')">Revés W</button>
+      <button class="action-btn btn-win" onclick="addPoint('Volea', 'Acierto', '')">Volea W</button>
     </div>
-    <button class="btn-action" onclick="terminarYReiniciar()">✓ GUARDAR Y NUEVO ALUMNO</button>
+
+    <div class="section-title">Errores (Selecciona golpe para zona)</div>
+    <div class="grid-actions">
+      <button class="action-btn btn-err" onclick="openErrorModal('Drive')">Drive ENF</button>
+      <button class="action-btn btn-err" onclick="openErrorModal('Revés')">Revés ENF</button>
+      <button class="action-btn btn-err" onclick="addPoint('Volea', 'Error', '')">Volea Error</button>
+      <button class="action-btn btn-err" style="grid-column: span 3; background:#7f1d1d;" onclick="addPoint('Drive', 'Error forzado', '')">Error Forzado</button>
+    </div>
+
+    <div style="font-size: 12px; color: var(--text-dim);" id="logStatusPuntos">Puntos anotados: 0</div>
+  </div>
+
+  <!-- VISTA 2: CANASTO SAQUE SIMULTÁNEO -->
+  <div id="view-saques" class="view">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div class="section-title">Series simultáneas</div>
+      <div style="font-size: 11px; color: var(--text-dim);">
+        Total tiros: <input type="number" id="serveTarget" value="10" style="width:40px; background:#0b1120; border:1px solid var(--border); color:white; border-radius:4px; text-align:center;">
+      </div>
+    </div>
+    <div id="servesContainer"></div>
+  </div>
+
+  <!-- Modal de Zona de Error -->
+  <div class="error-modal" id="errorModal">
+    <div class="modal-content">
+      <h3 id="modalTitle">¿Dónde falló?</h3>
+      <div class="zones-grid">
+        <button class="zone-btn" onclick="confirmError('Red')">RED</button>
+        <button class="zone-btn" onclick="confirmError('Larga')">LARGA</button>
+        <button class="zone-btn" onclick="confirmError('Ancha')">ANCHA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de exportación fija -->
+  <div class="footer-bar">
+    <button class="btn-reset" onclick="resetCurrentView()">Borrar</button>
+    <button class="btn-exp" onclick="exportData()">Exportar CSV</button>
   </div>
 
   <script>
-    document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+    let students = [];
+    let activeStudent = "";
+    let pointsLog = [];
+    let servesData = {};
+    let pendingStroke = "";
 
-    let historialPartidos = [];
-    let saques = { "1er saque": { in: 0, tot: 0 }, "2do saque": { in: 0, tot: 0 } };
-    let ultimasAcciones = [];
+    function initApp() {
+      const raw = document.getElementById('studentsInput').value;
+      students = raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      if (students.length > 0) activeStudent = students[0];
 
-    function vibrar() {
-      if (navigator.vibrate) navigator.vibrate(35);
-    }
-
-    function registrar(golpe, resultado, zona) {
-      vibrar();
-      const item = {
-        alumno: document.getElementById('alumno').value.trim() || "Alumno",
-        fecha: document.getElementById('fecha').value,
-        instancia: "Entrenamiento",
-        golpe: golpe,
-        resultado: resultado,
-        zona: zona
-      };
-      historialPartidos.push(item);
-      ultimasAcciones.push({ tipo: 'partido', item: item });
-      actualizarPantalla(`${golpe} - ${resultado} ${zona ? '('+zona+')' : ''}`);
-    }
-
-    function registrarSaque(adentro) {
-      vibrar();
-      const tipo = document.getElementById('tipoSaque').value;
-      saques[tipo].tot++;
-      if (adentro) saques[tipo].in++;
-      ultimasAcciones.push({ tipo: 'saque', tipoSaque: tipo, adentro: adentro });
-      actualizarPantalla(`Saque ${tipo}: ${adentro ? 'IN' : 'OUT'}`);
-    }
-
-    function deshacer() {
-      if (ultimasAcciones.length === 0) return;
-      const ultima = ultimasAcciones.pop();
-      if (ultima.tipo === 'partido') {
-        historialPartidos.pop();
-      } else if (ultima.tipo === 'saque') {
-        saques[ultima.tipoSaque].tot--;
-        if (ultima.adentro) saques[ultima.tipoSaque].in--;
-      }
-      actualizarPantalla("Último tiro deshecho");
-    }
-
-    function actualizarPantalla(mensaje) {
-      document.getElementById('log').innerText = mensaje;
-
-      const contadores = {
-        c_D_Red: 0, c_D_Larga: 0, c_D_Ancha: 0,
-        c_R_Red: 0, c_R_Larga: 0, c_R_Ancha: 0,
-        c_D_Win: 0, c_R_Win: 0, c_Ace: 0,
-        c_D_For: 0, c_R_For: 0,
-        c_Vol_In: 0, c_Vol_Out: 0
-      };
-
-      historialPartidos.forEach(p => {
-        if (p.golpe === 'Drive' && p.resultado === 'Error no forzado') {
-          if (p.zona === 'Red') contadores.c_D_Red++;
-          if (p.zona === 'Larga') contadores.c_D_Larga++;
-          if (p.zona === 'Ancha') contadores.c_D_Ancha++;
-        } else if (p.golpe === 'Revés' && p.resultado === 'Error no forzado') {
-          if (p.zona === 'Red') contadores.c_R_Red++;
-          if (p.zona === 'Larga') contadores.c_R_Larga++;
-          if (p.zona === 'Ancha') contadores.c_R_Ancha++;
-        } else if (p.resultado === 'Winner') {
-          if (p.golpe === 'Drive') contadores.c_D_Win++;
-          if (p.golpe === 'Revés') contadores.c_R_Win++;
-          if (p.golpe === 'Saque') contadores.c_Ace++;
-        } else if (p.resultado === 'Error forzado') {
-          if (p.golpe === 'Drive') contadores.c_D_For++;
-          if (p.golpe === 'Revés') contadores.c_R_For++;
-        } else if (p.golpe === 'Volea') {
-          if (p.resultado === 'Acierto') contadores.c_Vol_In++;
-          if (p.resultado === 'Error') contadores.c_Vol_Out++;
-        }
+      // Render barra alumnas
+      const stContainer = document.getElementById('studentsContainer');
+      stContainer.innerHTML = '';
+      students.forEach(st => {
+        const b = document.createElement('button');
+        b.className = `st-btn ${st === activeStudent ? 'active' : ''}`;
+        b.innerText = st;
+        b.onclick = () => {
+          activeStudent = st;
+          document.querySelectorAll('.st-btn').forEach(btn => btn.classList.remove('active'));
+          b.classList.add('active');
+        };
+        stContainer.appendChild(b);
       });
 
-      for (let k in contadores) {
-        document.getElementById(k).innerText = contadores[k];
-      }
-
-      const tipoActivo = document.getElementById('tipoSaque').value;
-      document.getElementById('c_Saque_In').innerText = saques[tipoActivo].in;
-      document.getElementById('c_Saque_Out').innerText = (saques[tipoActivo].tot - saques[tipoActivo].in);
-    }
-
-    document.getElementById('tipoSaque').addEventListener('change', () => actualizarPantalla('Modo saque: ' + document.getElementById('tipoSaque').value));
-
-    function generarCSVString() {
-      const alumno = document.getElementById('alumno').value.trim() || "Alumno";
-      const fecha = document.getElementById('fecha').value;
-
-      // BOM UTF-8 (\uFEFF) para forzar tildes en Excel y separador ';' para Excel en español
-      let csv = "\uFEFFsep=;\nAlumno;Fecha;Instancia;Golpe;Resultado;Zona falla\n";
-      historialPartidos.forEach(p => {
-        csv += `"${alumno}";"${p.fecha}";"${p.instancia}";"${p.golpe}";"${p.resultado}";"${p.zona}"\n`;
+      // Render tarjetas de saque
+      const srvContainer = document.getElementById('servesContainer');
+      srvContainer.innerHTML = '';
+      students.forEach(st => {
+        if (!servesData[st]) servesData[st] = { in1: 0, in2: 0 };
+        const card = document.createElement('div');
+        card.className = 'serve-card';
+        card.innerHTML = `
+          <div class="serve-name"><span>${st}</span></div>
+          <div class="serve-box">
+            <div style="font-size:11px; color:#94a3b8;">1er Saque</div>
+            <div class="count" id="s1-${st}">${servesData[st].in1}</div>
+            <button class="btn-serve-add" onclick="addServe('${st}', 1)">+ ACERTO</button>
+          </div>
+          <div class="serve-box">
+            <div style="font-size:11px; color:#94a3b8;">2do Saque</div>
+            <div class="count" id="s2-${st}">${servesData[st].in2}</div>
+            <button class="btn-serve-add" onclick="addServe('${st}', 2)">+ ACERTO</button>
+          </div>
+        `;
+        srvContainer.appendChild(card);
       });
-
-      csv += "\nTABLA CANASTO SAQUE\nAlumno;Fecha;Tipo de saque;Tiros totales;Tiros adentro\n";
-      if (saques["1er saque"].tot > 0) {
-        csv += `"${alumno}";"${fecha}";"1er saque";${saques["1er saque"].tot};${saques["1er saque"].in}\n`;
-      }
-      if (saques["2do saque"].tot > 0) {
-        csv += `"${alumno}";"${fecha}";"2do saque";${saques["2do saque"].tot};${saques["2do saque"].in}\n`;
-      }
-      return csv;
     }
 
-    function exportarCSV(silencioso = false) {
-      if (historialPartidos.length === 0 && saques["1er saque"].tot === 0 && saques["2do saque"].tot === 0) {
-        if (!silencioso) alert("No hay tiros registrados.");
-        return false;
+    function setTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      if (tab === 'puntos') {
+        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+        document.getElementById('view-puntos').classList.add('active');
+      } else {
+        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+        document.getElementById('view-saques').classList.add('active');
       }
-      const alumno = (document.getElementById('alumno').value.trim() || "Alumno").replace(/\s+/g, '_');
-      const ahora = new Date();
-      const horaStr = `${ahora.getHours()}h${String(ahora.getMinutes()).padStart(2, '0')}`;
-      const nombreArchivo = `${alumno}_${document.getElementById('fecha').value}_${horaStr}.csv`;
-
-      const csvContent = generarCSVString();
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = nombreArchivo;
-      a.click();
-      return true;
     }
 
-    function terminarYReiniciar() {
-      const alumnoActual = document.getElementById('alumno').value.trim() || "el alumno actual";
-      const confirmar = confirm(`¿Guardar datos de ${alumnoActual} y reiniciar a cero para el próximo turno?`);
-      if (!confirmar) return;
-
-      exportarCSV(true);
-
-      historialPartidos = [];
-      saques = { "1er saque": { in: 0, tot: 0 }, "2do saque": { in: 0, tot: 0 } };
-      ultimasAcciones = [];
-
-      document.getElementById('alumno').value = "";
-      actualizarPantalla("Listo para el siguiente alumno");
+    function getToday() {
+      const d = new Date();
+      return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
     }
+
+    /* Lógica Puntos */
+    function addPoint(golpe, resultado, zona) {
+      pointsLog.push({
+        Alumno: activeStudent,
+        Fecha: getToday(),
+        Instancia: "Entrenamiento",
+        Golpe: golpe,
+        Resultado: resultado,
+        ZonaFalla: zona
+      });
+      document.getElementById('logStatusPuntos').innerText = `Puntos anotados: ${pointsLog.length} (Último: ${activeStudent} - ${golpe})`;
+    }
+
+    function openErrorModal(golpe) {
+      pendingStroke = golpe;
+      document.getElementById('modalTitle').innerText = `${golpe}: ¿Dónde fue el fallo?`;
+      document.getElementById('errorModal').classList.add('show');
+    }
+
+    function confirmError(zona) {
+      addPoint(pendingStroke, "Error no forzado", zona);
+      document.getElementById('errorModal').classList.remove('show');
+    }
+
+    /* Lógica Saques */
+    function addServe(st, type) {
+      if (type === 1) {
+        servesData[st].in1++;
+        document.getElementById(`s1-${st}`).innerText = servesData[st].in1;
+      } else {
+        servesData[st].in2++;
+        document.getElementById(`s2-${st}`).innerText = servesData[st].in2;
+      }
+    }
+
+    /* Exportación CSV Limpia */
+    function exportData() {
+      const isPointsActive = document.getElementById('view-puntos').classList.contains('active');
+      let csv = "\uFEFF"; // BOM UTF-8 para evitar caracteres rotos en Excel
+
+      if (isPointsActive) {
+        if (pointsLog.length === 0) return alert("No hay jugadas anotadas.");
+        csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Zona falla\r\n";
+        pointsLog.forEach(r => {
+          csv += `"${r.Alumno}","${r.Fecha}","${r.Instancia}","${r.Golpe}","${r.Resultado}","${r.ZonaFalla}"\r\n`;
+        });
+        downloadFile(csv, `Puntos_Grupal_${Date.now()}.csv`);
+      } else {
+        const totalAttempts = document.getElementById('serveTarget').value || 10;
+        csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Total Intentos\r\n";
+        students.forEach(st => {
+          csv += `"${st}","${getToday()}","Entrenamiento","1er Saque",${servesData[st].in1},${totalAttempts}\r\n`;
+          csv += `"${st}","${getToday()}","Entrenamiento","2do Saque",${servesData[st].in2},${totalAttempts}\r\n`;
+        });
+        downloadFile(csv, `Canasto_Saque_${Date.now()}.csv`);
+      }
+    }
+
+    function downloadFile(content, filename) {
+      const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function resetCurrentView() {
+      if (!confirm("¿Seguro que querés reiniciar los contadores de esta vista?")) return;
+      const isPointsActive = document.getElementById('view-puntos').classList.contains('active');
+      if (isPointsActive) {
+        pointsLog = [];
+        document.getElementById('logStatusPuntos').innerText = "Puntos anotados: 0";
+      } else {
+        students.forEach(st => {
+          servesData[st] = { in1: 0, in2: 0 };
+        });
+        initApp();
+      }
+    }
+
+    window.onload = initApp;
   </script>
 </body>
 </html>
