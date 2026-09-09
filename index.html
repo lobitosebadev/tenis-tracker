@@ -23,7 +23,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); padding: 12px; padding-bottom: 95px; }
+    body { background-color: var(--bg); color: var(--text); padding: 12px; padding-bottom: 100px; }
 
     /* Pestañas */
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
@@ -67,12 +67,37 @@
 
     /* Barra inferior */
     .dock-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #030712; border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 8px; z-index: 50; }
-    .btn-dock { border: none; font-weight: 800; padding: 12px; border-radius: 8px; font-size: 13px; }
-    .btn-export { flex: 2; background: #10b981; color: #022c22; }
+    .btn-dock { border: none; font-weight: 800; padding: 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+    .btn-save-reset { flex: 1.8; background: #10b981; color: #022c22; }
+    .btn-export-only { flex: 1.2; background: #2563eb; color: white; }
     .btn-undo { flex: 1; background: var(--yellow); color: #451a03; }
     .btn-clear { flex: 1; background: #334155; color: white; }
 
     .status-text { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
+
+    /* Aviso flotante (Toast) no intrusivo */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--yellow);
+      color: #fef08a;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 99;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
   </style>
 </head>
 <body>
@@ -141,14 +166,19 @@
   <div class="dock-bar">
     <button class="btn-dock btn-undo" onclick="undoLast()">Deshacer</button>
     <button class="btn-dock btn-clear" onclick="clearData()">Borrar</button>
-    <button class="btn-dock btn-export" onclick="exportCSV()">Exportar CSV</button>
+    <button class="btn-dock btn-export-only" onclick="exportCSV(false)">Exportar</button>
+    <button class="btn-dock btn-save-reset" onclick="exportCSV(true)">Guardar y Nuevo</button>
   </div>
+
+  <!-- AVISO TOAST -->
+  <div id="toast" class="toast">Acción deshecha</div>
 
   <script>
     let players = [];
     let activePlayer = "";
     let matchLogs = [];
     let basketServes = {};
+    let toastTimeout = null;
 
     function renderApp() {
       const raw = document.getElementById('inputStudents').value;
@@ -223,7 +253,7 @@
 
     function recordPoint(golpe, res, zona) {
       if (!activePlayer) {
-        alert("Escribí el nombre del alumno arriba primero.");
+        showToast("⚠️ Escribí el alumno primero");
         return;
       }
       matchLogs.push({
@@ -247,15 +277,28 @@
       }
     }
 
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        t.classList.remove('show');
+      }, 1500);
+    }
+
     function undoLast() {
       const isPoints = document.getElementById('tab-puntos').classList.contains('active');
       if (isPoints) {
-        if (matchLogs.length === 0) return alert("No hay jugadas para deshacer.");
+        if (matchLogs.length === 0) {
+          showToast("Nada para deshacer");
+          return;
+        }
         const removed = matchLogs.pop();
-        alert(`Se eliminó: ${removed.Alumno} - ${removed.Golpe} ${removed.Resultado} ${removed.ZonaFalla}`);
+        showToast(`↩ Deshecho: ${removed.Alumno} (${removed.Golpe})`);
         updateStatus();
       } else {
-        alert("En saques podés reiniciar con el botón Borrar.");
+        showToast("En saques podés reiniciar con Borrar");
       }
     }
 
@@ -267,26 +310,46 @@
         : `Total sesión: ${total}`;
     }
 
-    function exportCSV() {
+    function exportCSV(resetAfter = false) {
       const isPoints = document.getElementById('tab-puntos').classList.contains('active');
       let csv = "\uFEFF";
 
       if (isPoints) {
-        if (matchLogs.length === 0) return alert("No hay jugadas registradas.");
+        if (matchLogs.length === 0) {
+          showToast("⚠️ No hay jugadas");
+          return;
+        }
         csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Zona falla\r\n";
         matchLogs.forEach(r => {
           csv += `"${r.Alumno}","${r.Fecha}","${r.Instancia}","${r.Golpe}","${r.Resultado}","${r.ZonaFalla}"\r\n`;
         });
-        triggerDownload(csv, `Partidos_${Date.now()}.csv`);
+        const prefix = players.length === 1 ? `Partidos_${players[0]}_` : `Partidos_`;
+        triggerDownload(csv, `${prefix}${Date.now()}.csv`);
+        
+        if (resetAfter) {
+          matchLogs = [];
+          updateStatus();
+          showToast("💾 Guardado y pantalla limpia");
+        }
       } else {
-        if (players.length === 0) return alert("No hay alumnos en la lista.");
+        if (players.length === 0) {
+          showToast("⚠️ Falta lista de alumnos");
+          return;
+        }
         const attempts = document.getElementById('serveTargetInput').value || 10;
         csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Total Intentos\r\n";
         players.forEach(p => {
           csv += `"${p}","${todayStr()}","Entrenamiento","1er Saque",${basketServes[p].s1},${attempts}\r\n`;
           csv += `"${p}","${todayStr()}","Entrenamiento","2do Saque",${basketServes[p].s2},${attempts}\r\n`;
         });
-        triggerDownload(csv, `Canasto_Saque_${Date.now()}.csv`);
+        const prefix = players.length === 1 ? `Canasto_${players[0]}_` : `Canasto_`;
+        triggerDownload(csv, `${prefix}${Date.now()}.csv`);
+
+        if (resetAfter) {
+          players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
+          renderApp();
+          showToast("💾 Guardado y contadores en 0");
+        }
       }
     }
 
@@ -301,7 +364,7 @@
     }
 
     function clearData() {
-      if (!confirm("¿Deseas reiniciar los datos de la pestaña actual?")) return;
+      if (!confirm("¿Deseas reiniciar los datos de la pestaña actual sin exportar?")) return;
       if (document.getElementById('tab-puntos').classList.contains('active')) {
         matchLogs = [];
         updateStatus();
@@ -309,6 +372,7 @@
         players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
         renderApp();
       }
+      showToast("Datos reiniciados");
     }
 
     window.onload = renderApp;
