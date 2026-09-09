@@ -3,266 +3,300 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Planilla Tenis Coach</title>
+  <title>Tennis Coach Tracker</title>
   <style>
     :root {
-      --bg: #0f172a;
+      --bg: #0b1329;
       --card: #1e293b;
       --border: #334155;
       --text: #f8fafc;
-      --text-dim: #94a3b8;
-      --green: #10b981;
-      --red: #ef4444;
-      --blue: #3b82f6;
-      --orange: #f59e0b;
-      --purple: #8b5cf6;
+      --text-muted: #94a3b8;
+      --green-bg: #064e3b;
+      --green-border: #10b981;
+      --green-text: #6ee7b7;
+      --red-bg: #450a0a;
+      --red-border: #ef4444;
+      --red-text: #fca5a5;
+      --blue: #2563eb;
+      --purple: #7c3aed;
+      --yellow: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: var(--bg); color: var(--text); padding: 12px; padding-bottom: 90px; }
+    body { background-color: var(--bg); color: var(--text); padding: 12px; padding-bottom: 95px; }
 
-    /* Navegación pestañas */
+    /* Pestañas */
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .tab-btn { background: var(--card); color: var(--text-dim); border: 1px solid var(--border); padding: 10px; font-weight: 600; border-radius: 8px; font-size: 14px; }
+    .tab-btn { background: var(--card); color: var(--text-muted); border: 1px solid var(--border); padding: 12px; font-weight: 700; border-radius: 8px; font-size: 14px; }
     .tab-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
 
     .view { display: none; }
     .view.active { display: block; }
 
-    /* Configuración de Alumnas */
-    .config-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 12px; }
-    .config-card label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px; }
-    .config-input { width: 100%; background: #0b1120; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; font-size: 13px; }
+    /* Configuración Alumnos */
+    .config-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+    .config-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; display: block; }
+    .config-input { width: 100%; background: #070d1e; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; font-size: 13px; }
 
-    /* Barra selección rápida de alumna activa (Puntos) */
-    .students-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; }
-    .st-btn { background: var(--card); border: 2px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; white-space: nowrap; }
-    .st-btn.active { background: var(--purple); border-color: #a78bfa; color: white; }
+    /* Barra selección de alumno */
+    .student-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; }
+    .st-chip { background: var(--card); border: 2px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+    .st-chip.active { background: var(--purple); border-color: #a78bfa; color: white; }
 
-    /* Botonera de Juego */
-    .section-title { font-size: 12px; font-weight: bold; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
-    .grid-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-    .action-btn { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 6px; color: white; font-size: 13px; font-weight: 600; text-align: center; }
-    .action-btn:active { transform: scale(0.97); }
-    .btn-win { background: #064e3b; border-color: var(--green); color: #6ee7b7; }
-    .btn-err { background: #450a0a; border-color: var(--red); color: #fca5a5; }
+    /* Secciones de botones */
+    .group-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .grid-1 { display: grid; grid-template-columns: 1fr; margin-bottom: 12px; }
 
-    /* Menú flotante de zona de error */
-    .error-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
-    .error-modal.show { display: flex; }
-    .modal-content { background: var(--card); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 320px; padding: 16px; text-align: center; }
-    .modal-content h3 { font-size: 15px; margin-bottom: 12px; }
-    .zones-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
-    .zone-btn { background: #262626; border: 1px solid #404040; color: white; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; }
-    .zone-btn:active { background: var(--red); }
+    .action-btn { border-radius: 10px; padding: 16px 8px; font-size: 15px; font-weight: 800; text-align: center; border: 1px solid transparent; cursor: pointer; }
+    .action-btn:active { transform: scale(0.96); filter: brightness(1.3); }
 
-    /* Canasto Saque */
-    .serve-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; }
-    .serve-name { grid-column: span 2; font-size: 15px; font-weight: bold; color: #38bdf8; display: flex; justify-content: space-between; }
-    .serve-box { background: #0b1120; border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; }
-    .serve-box .count { font-size: 18px; font-weight: 800; margin: 4px 0; }
-    .btn-serve-add { width: 100%; background: #065f46; border: 1px solid var(--green); color: white; padding: 8px 0; border-radius: 6px; font-weight: bold; font-size: 13px; }
-    .btn-serve-add:active { background: var(--green); }
+    /* Variantes de color */
+    .btn-winner { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
+    .btn-error { background: var(--red-bg); border-color: var(--red-border); color: var(--red-text); }
+    .btn-forced { background: #3f1d24; border-color: #f43f5e; color: #fda4af; }
 
-    /* Barra inferior fija */
-    .footer-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #020617; border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 8px; z-index: 50; }
-    .btn-exp { flex: 2; background: var(--green); color: black; border: none; font-weight: bold; padding: 12px; border-radius: 8px; font-size: 13px; }
-    .btn-reset { flex: 1; background: #334155; color: white; border: none; font-weight: bold; padding: 12px; border-radius: 8px; font-size: 13px; }
+    /* Canasto Saques */
+    .serve-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .serve-header { grid-column: span 2; font-size: 15px; font-weight: 800; color: #38bdf8; }
+    .serve-box { background: #070d1e; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; }
+    .serve-count { font-size: 24px; font-weight: 900; margin: 4px 0; }
+    .btn-serve-hit { width: 100%; background: #065f46; border: 1px solid var(--green-border); color: white; padding: 12px 0; border-radius: 6px; font-weight: 800; font-size: 14px; }
+    .btn-serve-hit:active { background: var(--green-border); }
+
+    /* Modal Zona Error */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+    .modal-backdrop.show { display: flex; }
+    .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 320px; padding: 18px; text-align: center; }
+    .modal-box h3 { font-size: 16px; margin-bottom: 14px; }
+    .zone-btn { width: 100%; background: #1e293b; border: 1px solid #475569; color: white; padding: 14px; border-radius: 8px; font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+    .zone-btn:active { background: var(--red-border); }
+
+    /* Barra inferior */
+    .dock-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #030712; border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 8px; z-index: 50; }
+    .btn-dock { border: none; font-weight: 800; padding: 12px; border-radius: 8px; font-size: 13px; }
+    .btn-export { flex: 2; background: #10b981; color: #022c22; }
+    .btn-undo { flex: 1; background: var(--yellow); color: #451a03; }
+    .btn-clear { flex: 1; background: #334155; color: white; }
+
+    .status-text { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
   </style>
 </head>
 <body>
 
-  <!-- Selector de Vistas -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="setTab('puntos')">Puntos / Juego</button>
-    <button class="tab-btn" onclick="setTab('saques')">Canasto Saque</button>
+    <button class="tab-btn active" onclick="switchTab('puntos')">Puntos / Juego</button>
+    <button class="tab-btn" onclick="switchTab('saques')">Canasto Saques</button>
   </div>
 
-  <!-- Configuración rápida de alumnas -->
   <div class="config-card">
-    <label>Alumnas presentes (separadas por coma):</label>
-    <input type="text" id="studentsInput" class="config-input" value="Martina, Sofia, Valentina, Camila" onchange="initApp()">
+    <label class="config-label">Alumnos (separar con comas):</label>
+    <input type="text" id="inputStudents" class="config-input" value="Pablo, Juan, Segundo" onchange="renderApp()">
   </div>
 
-  <!-- VISTA 1: PUNTOS / AMERICANA -->
-  <div id="view-puntos" class="view active">
-    <div class="section-title">Alumna activa para la jugada:</div>
-    <div class="students-scroll" id="studentsContainer"></div>
+  <!-- VISTA PUNTOS -->
+  <div id="tab-puntos" class="view active">
+    <div class="group-label">Alumno Activo:</div>
+    <div class="student-bar" id="studentBar"></div>
 
-    <div class="section-title">Tiros Ganadores (Winners)</div>
-    <div class="grid-actions">
-      <button class="action-btn btn-win" onclick="addPoint('Drive', 'Winner', '')">Drive W</button>
-      <button class="action-btn btn-win" onclick="addPoint('Revés', 'Winner', '')">Revés W</button>
-      <button class="action-btn btn-win" onclick="addPoint('Volea', 'Acierto', '')">Volea W</button>
+    <div class="group-label">Winners (Tiros Ganadores)</div>
+    <div class="grid-2">
+      <button class="action-btn btn-winner" onclick="recordPoint('Drive', 'Winner', '')">Drive W</button>
+      <button class="action-btn btn-winner" onclick="recordPoint('Revés', 'Winner', '')">Revés W</button>
     </div>
 
-    <div class="section-title">Errores (Selecciona golpe para zona)</div>
-    <div class="grid-actions">
-      <button class="action-btn btn-err" onclick="openErrorModal('Drive')">Drive ENF</button>
-      <button class="action-btn btn-err" onclick="openErrorModal('Revés')">Revés ENF</button>
-      <button class="action-btn btn-err" onclick="addPoint('Volea', 'Error', '')">Volea Error</button>
-      <button class="action-btn btn-err" style="grid-column: span 3; background:#7f1d1d;" onclick="addPoint('Drive', 'Error forzado', '')">Error Forzado</button>
+    <div class="group-label">Juego de Red (Volea)</div>
+    <div class="grid-2">
+      <button class="action-btn btn-winner" onclick="recordPoint('Volea', 'Acierto', '')">Volea Adentro</button>
+      <button class="action-btn btn-error" onclick="recordPoint('Volea', 'Error', '')">Volea Afuera</button>
     </div>
 
-    <div style="font-size: 12px; color: var(--text-dim);" id="logStatusPuntos">Puntos anotados: 0</div>
+    <div class="group-label">Errores No Forzados (Fondo)</div>
+    <div class="grid-2">
+      <button class="action-btn btn-error" onclick="promptErrorZone('Drive')">Drive ENF</button>
+      <button class="action-btn btn-error" onclick="promptErrorZone('Revés')">Revés ENF</button>
+    </div>
+
+    <div class="group-label">Defensa / Presión</div>
+    <div class="grid-1">
+      <button class="action-btn btn-forced" onclick="recordPoint('General', 'Error forzado', '')">Error Forzado</button>
+    </div>
+
+    <div class="status-text" id="statusPuntos">Registros totales: 0</div>
   </div>
 
-  <!-- VISTA 2: CANASTO SAQUE SIMULTÁNEO -->
-  <div id="view-saques" class="view">
-    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-      <div class="section-title">Series simultáneas</div>
-      <div style="font-size: 11px; color: var(--text-dim);">
-        Total tiros: <input type="number" id="serveTarget" value="10" style="width:40px; background:#0b1120; border:1px solid var(--border); color:white; border-radius:4px; text-align:center;">
+  <!-- VISTA SAQUES -->
+  <div id="tab-saques" class="view">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div class="group-label" style="margin:0;">Aciertos por serie</div>
+      <div style="font-size: 11px; color: var(--text-muted); font-weight:700;">
+        Intentos por tanda: <input type="number" id="serveTargetInput" value="10" style="width:42px; background:#070d1e; border:1px solid var(--border); color:white; border-radius:4px; text-align:center; padding:2px;">
       </div>
     </div>
-    <div id="servesContainer"></div>
+    <div id="servesList"></div>
   </div>
 
-  <!-- Modal de Zona de Error -->
-  <div class="error-modal" id="errorModal">
-    <div class="modal-content">
-      <h3 id="modalTitle">¿Dónde falló?</h3>
-      <div class="zones-grid">
-        <button class="zone-btn" onclick="confirmError('Red')">RED</button>
-        <button class="zone-btn" onclick="confirmError('Larga')">LARGA</button>
-        <button class="zone-btn" onclick="confirmError('Ancha')">ANCHA</button>
-      </div>
+  <!-- MODAL ZONA ERROR -->
+  <div class="modal-backdrop" id="zoneModal">
+    <div class="modal-box">
+      <h3 id="zoneModalTitle">¿Dónde falló?</h3>
+      <button class="zone-btn" onclick="saveZone('Red')">RED</button>
+      <button class="zone-btn" onclick="saveZone('Larga')">LARGA</button>
+      <button class="zone-btn" onclick="saveZone('Ancha')">ANCHA</button>
     </div>
   </div>
 
-  <!-- Barra de exportación fija -->
-  <div class="footer-bar">
-    <button class="btn-reset" onclick="resetCurrentView()">Borrar</button>
-    <button class="btn-exp" onclick="exportData()">Exportar CSV</button>
+  <!-- DOCK FIJO -->
+  <div class="dock-bar">
+    <button class="btn-dock btn-undo" onclick="undoLast()">Deshacer</button>
+    <button class="btn-dock btn-clear" onclick="clearData()">Borrar</button>
+    <button class="btn-dock btn-export" onclick="exportCSV()">Exportar CSV</button>
   </div>
 
   <script>
-    let students = [];
-    let activeStudent = "";
-    let pointsLog = [];
-    let servesData = {};
-    let pendingStroke = "";
+    let players = [];
+    let activePlayer = "";
+    let matchLogs = [];
+    let basketServes = {};
+    let activeStrokeForZone = "";
 
-    function initApp() {
-      const raw = document.getElementById('studentsInput').value;
-      students = raw.split(',').map(s => s.trim()).filter(s => s.length > 0);
-      if (students.length > 0) activeStudent = students[0];
+    function renderApp() {
+      const raw = document.getElementById('inputStudents').value;
+      players = raw.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      if (players.length > 0 && (!activePlayer || !players.includes(activePlayer))) {
+        activePlayer = players[0];
+      }
 
-      // Render barra alumnas
-      const stContainer = document.getElementById('studentsContainer');
-      stContainer.innerHTML = '';
-      students.forEach(st => {
-        const b = document.createElement('button');
-        b.className = `st-btn ${st === activeStudent ? 'active' : ''}`;
-        b.innerText = st;
-        b.onclick = () => {
-          activeStudent = st;
-          document.querySelectorAll('.st-btn').forEach(btn => btn.classList.remove('active'));
-          b.classList.add('active');
+      // Chips alumnos
+      const bar = document.getElementById('studentBar');
+      bar.innerHTML = '';
+      players.forEach(p => {
+        const chip = document.createElement('button');
+        chip.className = `st-chip ${p === activePlayer ? 'active' : ''}`;
+        chip.innerText = p;
+        chip.onclick = () => {
+          activePlayer = p;
+          document.querySelectorAll('.st-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
         };
-        stContainer.appendChild(b);
+        bar.appendChild(chip);
       });
 
-      // Render tarjetas de saque
-      const srvContainer = document.getElementById('servesContainer');
-      srvContainer.innerHTML = '';
-      students.forEach(st => {
-        if (!servesData[st]) servesData[st] = { in1: 0, in2: 0 };
+      // Tarjetas saque
+      const list = document.getElementById('servesList');
+      list.innerHTML = '';
+      players.forEach(p => {
+        if (!basketServes[p]) basketServes[p] = { s1: 0, s2: 0 };
         const card = document.createElement('div');
         card.className = 'serve-card';
         card.innerHTML = `
-          <div class="serve-name"><span>${st}</span></div>
+          <div class="serve-header">${p}</div>
           <div class="serve-box">
-            <div style="font-size:11px; color:#94a3b8;">1er Saque</div>
-            <div class="count" id="s1-${st}">${servesData[st].in1}</div>
-            <button class="btn-serve-add" onclick="addServe('${st}', 1)">+ ACERTO</button>
+            <div style="font-size:11px; color:#94a3b8; font-weight:700;">1er Saque</div>
+            <div class="serve-count" id="cnt1-${p}">${basketServes[p].s1}</div>
+            <button class="btn-serve-hit" onclick="logServeHit('${p}', 1)">+ ACERTÓ</button>
           </div>
           <div class="serve-box">
-            <div style="font-size:11px; color:#94a3b8;">2do Saque</div>
-            <div class="count" id="s2-${st}">${servesData[st].in2}</div>
-            <button class="btn-serve-add" onclick="addServe('${st}', 2)">+ ACERTO</button>
+            <div style="font-size:11px; color:#94a3b8; font-weight:700;">2do Saque</div>
+            <div class="serve-count" id="cnt2-${p}">${basketServes[p].s2}</div>
+            <button class="btn-serve-hit" onclick="logServeHit('${p}', 2)">+ ACERTÓ</button>
           </div>
         `;
-        srvContainer.appendChild(card);
+        list.appendChild(card);
       });
     }
 
-    function setTab(tab) {
+    function switchTab(t) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      if (tab === 'puntos') {
+      if (t === 'puntos') {
         document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-        document.getElementById('view-puntos').classList.add('active');
+        document.getElementById('tab-puntos').classList.add('active');
       } else {
         document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
-        document.getElementById('view-saques').classList.add('active');
+        document.getElementById('tab-saques').classList.add('active');
       }
     }
 
-    function getToday() {
+    function todayStr() {
       const d = new Date();
       return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
     }
 
-    /* Lógica Puntos */
-    function addPoint(golpe, resultado, zona) {
-      pointsLog.push({
-        Alumno: activeStudent,
-        Fecha: getToday(),
+    function recordPoint(golpe, res, zona) {
+      matchLogs.push({
+        Alumno: activePlayer,
+        Fecha: todayStr(),
         Instancia: "Entrenamiento",
         Golpe: golpe,
-        Resultado: resultado,
+        Resultado: res,
         ZonaFalla: zona
       });
-      document.getElementById('logStatusPuntos').innerText = `Puntos anotados: ${pointsLog.length} (Último: ${activeStudent} - ${golpe})`;
+      updateStatus();
     }
 
-    function openErrorModal(golpe) {
-      pendingStroke = golpe;
-      document.getElementById('modalTitle').innerText = `${golpe}: ¿Dónde fue el fallo?`;
-      document.getElementById('errorModal').classList.add('show');
+    function promptErrorZone(golpe) {
+      activeStrokeForZone = golpe;
+      document.getElementById('zoneModalTitle').innerText = `${golpe} ENF: ¿Dónde pegó?`;
+      document.getElementById('zoneModal').classList.add('show');
     }
 
-    function confirmError(zona) {
-      addPoint(pendingStroke, "Error no forzado", zona);
-      document.getElementById('errorModal').classList.remove('show');
+    function saveZone(zona) {
+      recordPoint(activeStrokeForZone, "Error no forzado", zona);
+      document.getElementById('zoneModal').classList.remove('show');
     }
 
-    /* Lógica Saques */
-    function addServe(st, type) {
+    function logServeHit(player, type) {
       if (type === 1) {
-        servesData[st].in1++;
-        document.getElementById(`s1-${st}`).innerText = servesData[st].in1;
+        basketServes[player].s1++;
+        document.getElementById(`cnt1-${player}`).innerText = basketServes[player].s1;
       } else {
-        servesData[st].in2++;
-        document.getElementById(`s2-${st}`).innerText = servesData[st].in2;
+        basketServes[player].s2++;
+        document.getElementById(`cnt2-${player}`).innerText = basketServes[player].s2;
       }
     }
 
-    /* Exportación CSV Limpia */
-    function exportData() {
-      const isPointsActive = document.getElementById('view-puntos').classList.contains('active');
-      let csv = "\uFEFF"; // BOM UTF-8 para evitar caracteres rotos en Excel
+    function undoLast() {
+      const isPoints = document.getElementById('tab-puntos').classList.contains('active');
+      if (isPoints) {
+        if (matchLogs.length === 0) return alert("No hay jugadas para deshacer.");
+        const removed = matchLogs.pop();
+        alert(`Se eliminó el último registro: ${removed.Alumno} - ${removed.Golpe} (${removed.Resultado})`);
+        updateStatus();
+      } else {
+        alert("En saques podés reiniciar la serie con el botón Borrar.");
+      }
+    }
 
-      if (isPointsActive) {
-        if (pointsLog.length === 0) return alert("No hay jugadas anotadas.");
+    function updateStatus() {
+      const total = matchLogs.length;
+      const playerTotal = matchLogs.filter(l => l.Alumno === activePlayer).length;
+      document.getElementById('statusPuntos').innerText = `Total sesión: ${total} | De ${activePlayer}: ${playerTotal}`;
+    }
+
+    function exportCSV() {
+      const isPoints = document.getElementById('tab-puntos').classList.contains('active');
+      let csv = "\uFEFF"; // Previene fallos de tildes (Revés)
+
+      if (isPoints) {
+        if (matchLogs.length === 0) return alert("No hay jugadas registradas.");
         csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Zona falla\r\n";
-        pointsLog.forEach(r => {
+        matchLogs.forEach(r => {
           csv += `"${r.Alumno}","${r.Fecha}","${r.Instancia}","${r.Golpe}","${r.Resultado}","${r.ZonaFalla}"\r\n`;
         });
-        downloadFile(csv, `Puntos_Grupal_${Date.now()}.csv`);
+        triggerDownload(csv, `Partidos_${Date.now()}.csv`);
       } else {
-        const totalAttempts = document.getElementById('serveTarget').value || 10;
+        const attempts = document.getElementById('serveTargetInput').value || 10;
         csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Total Intentos\r\n";
-        students.forEach(st => {
-          csv += `"${st}","${getToday()}","Entrenamiento","1er Saque",${servesData[st].in1},${totalAttempts}\r\n`;
-          csv += `"${st}","${getToday()}","Entrenamiento","2do Saque",${servesData[st].in2},${totalAttempts}\r\n`;
+        players.forEach(p => {
+          csv += `"${p}","${todayStr()}","Entrenamiento","1er Saque",${basketServes[p].s1},${attempts}\r\n`;
+          csv += `"${p}","${todayStr()}","Entrenamiento","2do Saque",${basketServes[p].s2},${attempts}\r\n`;
         });
-        downloadFile(csv, `Canasto_Saque_${Date.now()}.csv`);
+        triggerDownload(csv, `Canasto_Saque_${Date.now()}.csv`);
       }
     }
 
-    function downloadFile(content, filename) {
+    function triggerDownload(content, filename) {
       const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -272,21 +306,18 @@
       document.body.removeChild(link);
     }
 
-    function resetCurrentView() {
-      if (!confirm("¿Seguro que querés reiniciar los contadores de esta vista?")) return;
-      const isPointsActive = document.getElementById('view-puntos').classList.contains('active');
-      if (isPointsActive) {
-        pointsLog = [];
-        document.getElementById('logStatusPuntos').innerText = "Puntos anotados: 0";
+    function clearData() {
+      if (!confirm("¿Deseas reiniciar los datos de la pestaña actual?")) return;
+      if (document.getElementById('tab-puntos').classList.contains('active')) {
+        matchLogs = [];
+        updateStatus();
       } else {
-        students.forEach(st => {
-          servesData[st] = { in1: 0, in2: 0 };
-        });
-        initApp();
+        players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
+        renderApp();
       }
     }
 
-    window.onload = initApp;
+    window.onload = renderApp;
   </script>
 </body>
 </html>
