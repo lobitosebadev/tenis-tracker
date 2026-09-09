@@ -36,19 +36,20 @@
     /* Configuración Alumnos */
     .config-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
     .config-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px; display: block; }
-    .config-input { width: 100%; background: #070d1e; border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; font-size: 13px; }
+    .config-input { width: 100%; background: #070d1e; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; font-size: 14px; }
 
     /* Barra selección de alumno */
-    .student-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; }
+    .student-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; min-height: 44px; }
     .st-chip { background: var(--card); border: 2px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 700; white-space: nowrap; }
     .st-chip.active { background: var(--purple); border-color: #a78bfa; color: white; }
 
     /* Secciones de botones */
     .group-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
     .grid-1 { display: grid; grid-template-columns: 1fr; margin-bottom: 12px; }
 
-    .action-btn { border-radius: 10px; padding: 16px 8px; font-size: 15px; font-weight: 800; text-align: center; border: 1px solid transparent; cursor: pointer; }
+    .action-btn { border-radius: 10px; padding: 14px 4px; font-size: 14px; font-weight: 800; text-align: center; border: 1px solid transparent; cursor: pointer; }
     .action-btn:active { transform: scale(0.96); filter: brightness(1.3); }
 
     /* Variantes de color */
@@ -63,14 +64,6 @@
     .serve-count { font-size: 24px; font-weight: 900; margin: 4px 0; }
     .btn-serve-hit { width: 100%; background: #065f46; border: 1px solid var(--green-border); color: white; padding: 12px 0; border-radius: 6px; font-weight: 800; font-size: 14px; }
     .btn-serve-hit:active { background: var(--green-border); }
-
-    /* Modal Zona Error */
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
-    .modal-backdrop.show { display: flex; }
-    .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 14px; width: 100%; max-width: 320px; padding: 18px; text-align: center; }
-    .modal-box h3 { font-size: 16px; margin-bottom: 14px; }
-    .zone-btn { width: 100%; background: #1e293b; border: 1px solid #475569; color: white; padding: 14px; border-radius: 8px; font-weight: 800; font-size: 15px; margin-bottom: 8px; }
-    .zone-btn:active { background: var(--red-border); }
 
     /* Barra inferior */
     .dock-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #030712; border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 8px; z-index: 50; }
@@ -91,7 +84,7 @@
 
   <div class="config-card">
     <label class="config-label">Alumnos (separar con comas):</label>
-    <input type="text" id="inputStudents" class="config-input" value="" placeholder="Escribí los nombres..." onchange="renderApp()">
+    <input type="text" id="inputStudents" class="config-input" value="" placeholder="Ej: Pablo, Segundo" oninput="renderApp()">
   </div>
 
   <!-- VISTA PUNTOS -->
@@ -99,7 +92,7 @@
     <div class="group-label">Alumno Activo:</div>
     <div class="student-bar" id="studentBar"></div>
 
-    <div class="group-label">Winners (Tiros Ganadores)</div>
+    <div class="group-label">Winners</div>
     <div class="grid-2">
       <button class="action-btn btn-winner" onclick="recordPoint('Drive', 'Winner', '')">Drive W</button>
       <button class="action-btn btn-winner" onclick="recordPoint('Revés', 'Winner', '')">Revés W</button>
@@ -111,10 +104,18 @@
       <button class="action-btn btn-error" onclick="recordPoint('Volea', 'Error', '')">Volea Afuera</button>
     </div>
 
-    <div class="group-label">Errores No Forzados (Fondo)</div>
-    <div class="grid-2">
-      <button class="action-btn btn-error" onclick="promptErrorZone('Drive')">Drive ENF</button>
-      <button class="action-btn btn-error" onclick="promptErrorZone('Revés')">Revés ENF</button>
+    <div class="group-label">Errores Drive</div>
+    <div class="grid-3">
+      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Red')">D Red</button>
+      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Larga')">D Larga</button>
+      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Ancha')">D Ancha</button>
+    </div>
+
+    <div class="group-label">Errores Revés</div>
+    <div class="grid-3">
+      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Red')">R Red</button>
+      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Larga')">R Larga</button>
+      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Ancha')">R Ancha</button>
     </div>
 
     <div class="group-label">Defensa / Presión</div>
@@ -136,16 +137,6 @@
     <div id="servesList"></div>
   </div>
 
-  <!-- MODAL ZONA ERROR -->
-  <div class="modal-backdrop" id="zoneModal">
-    <div class="modal-box">
-      <h3 id="zoneModalTitle">¿Dónde falló?</h3>
-      <button class="zone-btn" onclick="saveZone('Red')">RED</button>
-      <button class="zone-btn" onclick="saveZone('Larga')">LARGA</button>
-      <button class="zone-btn" onclick="saveZone('Ancha')">ANCHA</button>
-    </div>
-  </div>
-
   <!-- DOCK FIJO -->
   <div class="dock-bar">
     <button class="btn-dock btn-undo" onclick="undoLast()">Deshacer</button>
@@ -158,16 +149,20 @@
     let activePlayer = "";
     let matchLogs = [];
     let basketServes = {};
-    let activeStrokeForZone = "";
 
     function renderApp() {
       const raw = document.getElementById('inputStudents').value;
       players = raw.split(',').map(p => p.trim()).filter(p => p.length > 0);
-      if (players.length > 0 && (!activePlayer || !players.includes(activePlayer))) {
-        activePlayer = players[0];
+      
+      if (players.length > 0) {
+        if (!activePlayer || !players.includes(activePlayer)) {
+          activePlayer = players[0];
+        }
+      } else {
+        activePlayer = "";
       }
 
-      // Chips alumnos
+      // Render barra alumnos
       const bar = document.getElementById('studentBar');
       bar.innerHTML = '';
       players.forEach(p => {
@@ -178,11 +173,12 @@
           activePlayer = p;
           document.querySelectorAll('.st-chip').forEach(c => c.classList.remove('active'));
           chip.classList.add('active');
+          updateStatus();
         };
         bar.appendChild(chip);
       });
 
-      // Tarjetas saque
+      // Render tarjetas de saque
       const list = document.getElementById('servesList');
       list.innerHTML = '';
       players.forEach(p => {
@@ -204,6 +200,8 @@
         `;
         list.appendChild(card);
       });
+
+      updateStatus();
     }
 
     function switchTab(t) {
@@ -224,6 +222,10 @@
     }
 
     function recordPoint(golpe, res, zona) {
+      if (!activePlayer) {
+        alert("Escribí el nombre del alumno arriba primero.");
+        return;
+      }
       matchLogs.push({
         Alumno: activePlayer,
         Fecha: todayStr(),
@@ -233,17 +235,6 @@
         ZonaFalla: zona
       });
       updateStatus();
-    }
-
-    function promptErrorZone(golpe) {
-      activeStrokeForZone = golpe;
-      document.getElementById('zoneModalTitle').innerText = `${golpe} ENF: ¿Dónde pegó?`;
-      document.getElementById('zoneModal').classList.add('show');
-    }
-
-    function saveZone(zona) {
-      recordPoint(activeStrokeForZone, "Error no forzado", zona);
-      document.getElementById('zoneModal').classList.remove('show');
     }
 
     function logServeHit(player, type) {
@@ -261,22 +252,24 @@
       if (isPoints) {
         if (matchLogs.length === 0) return alert("No hay jugadas para deshacer.");
         const removed = matchLogs.pop();
-        alert(`Se eliminó el último registro: ${removed.Alumno} - ${removed.Golpe} (${removed.Resultado})`);
+        alert(`Se eliminó: ${removed.Alumno} - ${removed.Golpe} ${removed.Resultado} ${removed.ZonaFalla}`);
         updateStatus();
       } else {
-        alert("En saques podés reiniciar la serie con el botón Borrar.");
+        alert("En saques podés reiniciar con el botón Borrar.");
       }
     }
 
     function updateStatus() {
       const total = matchLogs.length;
       const playerTotal = matchLogs.filter(l => l.Alumno === activePlayer).length;
-      document.getElementById('statusPuntos').innerText = `Total sesión: ${total} | De ${activePlayer}: ${playerTotal}`;
+      document.getElementById('statusPuntos').innerText = activePlayer 
+        ? `Total sesión: ${total} | De ${activePlayer}: ${playerTotal}`
+        : `Total sesión: ${total}`;
     }
 
     function exportCSV() {
       const isPoints = document.getElementById('tab-puntos').classList.contains('active');
-      let csv = "\uFEFF"; // Previene fallos de tildes (Revés)
+      let csv = "\uFEFF";
 
       if (isPoints) {
         if (matchLogs.length === 0) return alert("No hay jugadas registradas.");
@@ -286,6 +279,7 @@
         });
         triggerDownload(csv, `Partidos_${Date.now()}.csv`);
       } else {
+        if (players.length === 0) return alert("No hay alumnos en la lista.");
         const attempts = document.getElementById('serveTargetInput').value || 10;
         csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Total Intentos\r\n";
         players.forEach(p => {
