@@ -145,7 +145,7 @@
 
     <div class="group-label">Defensa / Presión</div>
     <div class="grid-1">
-      <button class="action-btn btn-forced" onclick="recordPoint('General', 'Error forzado', '')">Error Forzado</button>
+      <button class="action-btn btn-forced" onclick="recordPoint('General', 'Error forzado', 'Forzado')">Error Forzado</button>
     </div>
 
     <div class="status-text" id="statusPuntos">Registros totales: 0</div>
@@ -333,7 +333,7 @@
         csv += `"${r.Alumno}";"${r.Fecha}";"${r.Instancia}";"${r.Golpe}";"${r.Resultado}";"${r.ZonaFalla}"\r\n`;
       });
 
-      // 2. SEPARADOR Y BLOQUE CANASTO SAQUES (Idéntico a tus archivos originales de Juan y Segundo)
+      // 2. SEPARADOR Y BLOQUE CANASTO SAQUES
       csv += "\r\n";
       csv += "TABLA CANASTO DE SAQUE\r\n";
       csv += "Alumno;Fecha;Tipo de saque;Tiros totales;Tiros adentro\r\n";
