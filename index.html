@@ -27,7 +27,7 @@
 
     /* Pestañas */
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .tab-btn { background: var(--card); color: var(--text-muted); border: 1px solid var(--border); padding: 12px; font-weight: 700; border-radius: 8px; font-size: 14px; }
+    .tab-btn { background: var(--card); color: var(--text-muted); border: 1px solid var(--border); padding: 12px; font-weight: 700; border-radius: 8px; font-size: 14px; cursor: pointer; }
     .tab-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
 
     .view { display: none; }
@@ -40,7 +40,7 @@
 
     /* Barra selección de alumno */
     .student-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; min-height: 44px; }
-    .st-chip { background: var(--card); border: 2px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+    .st-chip { background: var(--card); border: 2px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; }
     .st-chip.active { background: var(--purple); border-color: #a78bfa; color: white; }
 
     /* Secciones de botones */
@@ -62,7 +62,7 @@
     .serve-header { grid-column: span 2; font-size: 15px; font-weight: 800; color: #38bdf8; }
     .serve-box { background: #070d1e; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; }
     .serve-count { font-size: 24px; font-weight: 900; margin: 4px 0; }
-    .btn-serve-hit { width: 100%; background: #065f46; border: 1px solid var(--green-border); color: white; padding: 12px 0; border-radius: 6px; font-weight: 800; font-size: 14px; }
+    .btn-serve-hit { width: 100%; background: #065f46; border: 1px solid var(--green-border); color: white; padding: 12px 0; border-radius: 6px; font-weight: 800; font-size: 14px; cursor: pointer; }
     .btn-serve-hit:active { background: var(--green-border); }
 
     /* Barra inferior */
@@ -166,8 +166,8 @@
   <div class="dock-bar">
     <button class="btn-dock btn-undo" onclick="undoLast()">Deshacer</button>
     <button class="btn-dock btn-clear" onclick="clearData()">Borrar</button>
-    <button class="btn-dock btn-export-only" onclick="exportCSV(false)">Exportar</button>
-    <button class="btn-dock btn-save-reset" onclick="exportCSV(true)">Guardar y Nuevo</button>
+    <button class="btn-dock btn-export-only" onclick="exportFullSession(false)">Exportar</button>
+    <button class="btn-dock btn-save-reset" onclick="exportFullSession(true)">Guardar y Nuevo</button>
   </div>
 
   <!-- AVISO TOAST -->
@@ -310,46 +310,54 @@
         : `Total sesión: ${total}`;
     }
 
-    function exportCSV(resetAfter = false) {
-      const isPoints = document.getElementById('tab-puntos').classList.contains('active');
+    // EXPORTACIÓN UNIFICADA: Todo en un solo archivo CSV
+    function exportFullSession(resetAfter = false) {
+      const totalPoints = matchLogs.length;
+      let hasServes = false;
+      players.forEach(p => {
+        if (basketServes[p] && (basketServes[p].s1 > 0 || basketServes[p].s2 > 0)) {
+          hasServes = true;
+        }
+      });
+
+      if (totalPoints === 0 && !hasServes) {
+        showToast("⚠️ No hay datos para guardar");
+        return;
+      }
+
       let csv = "\uFEFF";
 
-      if (isPoints) {
-        if (matchLogs.length === 0) {
-          showToast("⚠️ No hay jugadas");
-          return;
-        }
-        csv += "Alumno;Fecha;Instancia;Golpe;Resultado;Zona falla\r\n";
-        matchLogs.forEach(r => {
-          csv += `"${r.Alumno}";"${r.Fecha}";"${r.Instancia}";"${r.Golpe}";"${r.Resultado}";"${r.ZonaFalla}"\r\n`;
-        });
-        const prefix = players.length === 1 ? `Partidos_${players[0]}_` : `Partidos_`;
-        triggerDownload(csv, `${prefix}${Date.now()}.csv`);
-        
-        if (resetAfter) {
-          matchLogs = [];
-          updateStatus();
-          showToast("💾 Guardado y pantalla limpia");
-        }
-      } else {
-        if (players.length === 0) {
-          showToast("⚠️ Falta lista de alumnos");
-          return;
-        }
-        const attempts = document.getElementById('serveTargetInput').value || 10;
-        csv += "Alumno;Fecha;Instancia;Golpe;Resultado;Total Intentos\r\n";
-        players.forEach(p => {
-          csv += `"${p}";"${todayStr()}";"Entrenamiento";"1er Saque";${basketServes[p].s1};${attempts}\r\n`;
-          csv += `"${p}";"${todayStr()}";"Entrenamiento";"2do Saque";${basketServes[p].s2};${attempts}\r\n`;
-        });
-        const prefix = players.length === 1 ? `Canasto_${players[0]}_` : `Canasto_`;
-        triggerDownload(csv, `${prefix}${Date.now()}.csv`);
+      // 1. BLOQUE PUNTOS / JUEGO
+      csv += "Alumno;Fecha;Instancia;Golpe;Resultado;Zona falla\r\n";
+      matchLogs.forEach(r => {
+        csv += `"${r.Alumno}";"${r.Fecha}";"${r.Instancia}";"${r.Golpe}";"${r.Resultado}";"${r.ZonaFalla}"\r\n`;
+      });
 
-        if (resetAfter) {
-          players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
-          renderApp();
-          showToast("💾 Guardado y contadores en 0");
-        }
+      // 2. SEPARADOR Y BLOQUE CANASTO SAQUES (Idéntico a tus archivos originales de Juan y Segundo)
+      csv += "\r\n";
+      csv += "TABLA CANASTO DE SAQUE\r\n";
+      csv += "Alumno;Fecha;Tipo de saque;Tiros totales;Tiros adentro\r\n";
+      
+      const attempts = document.getElementById('serveTargetInput').value || 10;
+      players.forEach(p => {
+        const s1 = (basketServes[p] && basketServes[p].s1) ? basketServes[p].s1 : 0;
+        const s2 = (basketServes[p] && basketServes[p].s2) ? basketServes[p].s2 : 0;
+        csv += `"${p}";"${todayStr()}";"1er Saque";${attempts};${s1}\r\n`;
+        csv += `"${p}";"${todayStr()}";"2do Saque";${attempts};${s2}\r\n`;
+      });
+
+      // Nombre estandarizado de archivo
+      const studentTag = players.length === 1 ? players[0] : "Sesion";
+      const fileName = `tenis_${studentTag}_${Date.now()}.csv`;
+      triggerDownload(csv, fileName);
+
+      if (resetAfter) {
+        matchLogs = [];
+        players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
+        renderApp();
+        showToast("💾 Sesión guardada y reiniciada");
+      } else {
+        showToast("💾 Archivo CSV descargado");
       }
     }
 
@@ -364,14 +372,10 @@
     }
 
     function clearData() {
-      if (!confirm("¿Deseas reiniciar los datos de la pestaña actual sin exportar?")) return;
-      if (document.getElementById('tab-puntos').classList.contains('active')) {
-        matchLogs = [];
-        updateStatus();
-      } else {
-        players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
-        renderApp();
-      }
+      if (!confirm("¿Deseas reiniciar todos los datos (puntos y saques) sin guardar?")) return;
+      matchLogs = [];
+      players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
+      renderApp();
       showToast("Datos reiniciados");
     }
 
