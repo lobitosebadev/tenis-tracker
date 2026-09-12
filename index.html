@@ -75,7 +75,7 @@
 
     .status-text { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
 
-    /* Aviso flotante (Toast) no intrusivo */
+    /* Aviso flotante (Toast) */
     .toast {
       position: fixed;
       bottom: 80px;
@@ -319,9 +319,9 @@
           showToast("⚠️ No hay jugadas");
           return;
         }
-        csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Zona falla\r\n";
+        csv += "Alumno;Fecha;Instancia;Golpe;Resultado;Zona falla\r\n";
         matchLogs.forEach(r => {
-          csv += `"${r.Alumno}","${r.Fecha}","${r.Instancia}","${r.Golpe}","${r.Resultado}","${r.ZonaFalla}"\r\n`;
+          csv += `"${r.Alumno}";"${r.Fecha}";"${r.Instancia}";"${r.Golpe}";"${r.Resultado}";"${r.ZonaFalla}"\r\n`;
         });
         const prefix = players.length === 1 ? `Partidos_${players[0]}_` : `Partidos_`;
         triggerDownload(csv, `${prefix}${Date.now()}.csv`);
@@ -337,10 +337,10 @@
           return;
         }
         const attempts = document.getElementById('serveTargetInput').value || 10;
-        csv += "Alumno,Fecha,Instancia,Golpe,Resultado,Total Intentos\r\n";
+        csv += "Alumno;Fecha;Instancia;Golpe;Resultado;Total Intentos\r\n";
         players.forEach(p => {
-          csv += `"${p}","${todayStr()}","Entrenamiento","1er Saque",${basketServes[p].s1},${attempts}\r\n`;
-          csv += `"${p}","${todayStr()}","Entrenamiento","2do Saque",${basketServes[p].s2},${attempts}\r\n`;
+          csv += `"${p}";"${todayStr()}";"Entrenamiento";"1er Saque";${basketServes[p].s1};${attempts}\r\n`;
+          csv += `"${p}";"${todayStr()}";"Entrenamiento";"2do Saque";${basketServes[p].s2};${attempts}\r\n`;
         });
         const prefix = players.length === 1 ? `Canasto_${players[0]}_` : `Canasto_`;
         triggerDownload(csv, `${prefix}${Date.now()}.csv`);
