@@ -49,8 +49,10 @@
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
     .grid-1 { display: grid; grid-template-columns: 1fr; margin-bottom: 12px; }
 
-    .action-btn { border-radius: 10px; padding: 14px 4px; font-size: 14px; font-weight: 800; text-align: center; border: 1px solid transparent; cursor: pointer; }
+    .action-btn { position: relative; border-radius: 10px; padding: 12px 4px; font-size: 13px; font-weight: 800; text-align: center; border: 1px solid transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
     .action-btn:active { transform: scale(0.96); filter: brightness(1.3); }
+
+    .badge-count { font-size: 11px; background: rgba(0, 0, 0, 0.4); border-radius: 12px; padding: 1px 8px; border: 1px solid rgba(255, 255, 255, 0.15); }
 
     /* Variantes de color */
     .btn-winner { background: var(--green-bg); border-color: var(--green-border); color: var(--green-text); }
@@ -58,12 +60,18 @@
     .btn-forced { background: #3f1d24; border-color: #f43f5e; color: #fda4af; }
 
     /* Canasto Saques */
-    .serve-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .serve-header { grid-column: span 2; font-size: 15px; font-weight: 800; color: #38bdf8; }
-    .serve-box { background: #070d1e; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; }
-    .serve-count { font-size: 24px; font-weight: 900; margin: 4px 0; }
-    .btn-serve-hit { width: 100%; background: #065f46; border: 1px solid var(--green-border); color: white; padding: 12px 0; border-radius: 6px; font-weight: 800; font-size: 14px; cursor: pointer; }
-    .btn-serve-hit:active { background: var(--green-border); }
+    .serve-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+    .serve-header { font-size: 15px; font-weight: 800; color: #38bdf8; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    .serve-grid-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .serve-box { background: #070d1e; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+    .serve-count-row { font-size: 18px; font-weight: 900; margin: 6px 0; color: #f8fafc; }
+    .serve-btn-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+    
+    .btn-srv-in { background: #065f46; border: 1px solid var(--green-border); color: white; padding: 10px 0; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; }
+    .btn-srv-in:active { background: var(--green-border); }
+
+    .btn-srv-out { background: #7f1d1d; border: 1px solid var(--red-border); color: white; padding: 10px 0; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; }
+    .btn-srv-out:active { background: var(--red-border); }
 
     /* Barra inferior */
     .dock-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #030712; border-top: 1px solid var(--border); padding: 10px 12px; display: flex; gap: 8px; z-index: 50; }
@@ -119,46 +127,74 @@
 
     <div class="group-label">Winners</div>
     <div class="grid-2">
-      <button class="action-btn btn-winner" onclick="recordPoint('Drive', 'Winner', '')">Drive W</button>
-      <button class="action-btn btn-winner" onclick="recordPoint('Revés', 'Winner', '')">Revés W</button>
+      <button class="action-btn btn-winner" onclick="recordPoint('Drive', 'Winner', '')">
+        <span>Drive W</span>
+        <span class="badge-count" id="badge-Drive-Winner-">0</span>
+      </button>
+      <button class="action-btn btn-winner" onclick="recordPoint('Revés', 'Winner', '')">
+        <span>Revés W</span>
+        <span class="badge-count" id="badge-Revés-Winner-">0</span>
+      </button>
     </div>
 
     <div class="group-label">Juego de Red (Volea)</div>
     <div class="grid-2">
-      <button class="action-btn btn-winner" onclick="recordPoint('Volea', 'Acierto', '')">Volea Adentro</button>
-      <button class="action-btn btn-error" onclick="recordPoint('Volea', 'Error', '')">Volea Afuera</button>
+      <button class="action-btn btn-winner" onclick="recordPoint('Volea', 'Acierto', '')">
+        <span>Volea Adentro</span>
+        <span class="badge-count" id="badge-Volea-Acierto-">0</span>
+      </button>
+      <button class="action-btn btn-error" onclick="recordPoint('Volea', 'Error', '')">
+        <span>Volea Afuera</span>
+        <span class="badge-count" id="badge-Volea-Error-">0</span>
+      </button>
     </div>
 
     <div class="group-label">Errores Drive</div>
     <div class="grid-3">
-      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Red')">D Red</button>
-      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Larga')">D Larga</button>
-      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Ancha')">D Ancha</button>
+      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Red')">
+        <span>D Red</span>
+        <span class="badge-count" id="badge-Drive-Error no forzado-Red">0</span>
+      </button>
+      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Larga')">
+        <span>D Larga</span>
+        <span class="badge-count" id="badge-Drive-Error no forzado-Larga">0</span>
+      </button>
+      <button class="action-btn btn-error" onclick="recordPoint('Drive', 'Error no forzado', 'Ancha')">
+        <span>D Ancha</span>
+        <span class="badge-count" id="badge-Drive-Error no forzado-Ancha">0</span>
+      </button>
     </div>
 
     <div class="group-label">Errores Revés</div>
     <div class="grid-3">
-      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Red')">R Red</button>
-      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Larga')">R Larga</button>
-      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Ancha')">R Ancha</button>
+      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Red')">
+        <span>R Red</span>
+        <span class="badge-count" id="badge-Revés-Error no forzado-Red">0</span>
+      </button>
+      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Larga')">
+        <span>R Larga</span>
+        <span class="badge-count" id="badge-Revés-Error no forzado-Larga">0</span>
+      </button>
+      <button class="action-btn btn-error" onclick="recordPoint('Revés', 'Error no forzado', 'Ancha')">
+        <span>R Ancha</span>
+        <span class="badge-count" id="badge-Revés-Error no forzado-Ancha">0</span>
+      </button>
     </div>
 
     <div class="group-label">Defensa / Presión</div>
     <div class="grid-1">
-      <button class="action-btn btn-forced" onclick="recordPoint('General', 'Error forzado', 'Forzado')">Error Forzado</button>
+      <button class="action-btn btn-forced" onclick="recordPoint('General', 'Error forzado', 'Forzado')">
+        <span>Error Forzado</span>
+        <span class="badge-count" id="badge-General-Error forzado-Forzado">0</span>
+      </button>
     </div>
 
-    <div class="status-text" id="statusPuntos">Registros totales: 0</div>
+    <div class="status-text" id="statusPuntos">Total sesión: 0</div>
   </div>
 
   <!-- VISTA SAQUES -->
   <div id="tab-saques" class="view">
-    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-      <div class="group-label" style="margin:0;">Aciertos por serie</div>
-      <div style="font-size: 11px; color: var(--text-muted); font-weight:700;">
-        Intentos por tanda: <input type="number" id="serveTargetInput" value="10" style="width:42px; background:#070d1e; border:1px solid var(--border); color:white; border-radius:4px; text-align:center; padding:2px;">
-      </div>
-    </div>
+    <div class="group-label" style="margin-bottom:10px;">Control de Saque por Alumno</div>
     <div id="servesList"></div>
   </div>
 
@@ -177,7 +213,7 @@
     let players = [];
     let activePlayer = "";
     let matchLogs = [];
-    let basketServes = {};
+    let basketServes = {}; // Estructura: { Alumno: { s1_in: 0, s1_tot: 0, s2_in: 0, s2_tot: 0 } }
     let toastTimeout = null;
 
     function renderApp() {
@@ -192,7 +228,7 @@
         activePlayer = "";
       }
 
-      // Render barra alumnos
+      // Render barra de alumnos
       const bar = document.getElementById('studentBar');
       bar.innerHTML = '';
       players.forEach(p => {
@@ -204,34 +240,60 @@
           document.querySelectorAll('.st-chip').forEach(c => c.classList.remove('active'));
           chip.classList.add('active');
           updateStatus();
+          updateActionBadges();
         };
         bar.appendChild(chip);
       });
 
-      // Render tarjetas de saque
+      // Asegurar estructura de datos para saques
+      players.forEach(p => {
+        if (!basketServes[p]) {
+          basketServes[p] = { s1_in: 0, s1_tot: 0, s2_in: 0, s2_tot: 0 };
+        }
+      });
+
+      renderServesList();
+      updateStatus();
+      updateActionBadges();
+    }
+
+    function renderServesList() {
       const list = document.getElementById('servesList');
       list.innerHTML = '';
       players.forEach(p => {
-        if (!basketServes[p]) basketServes[p] = { s1: 0, s2: 0 };
+        const s = basketServes[p] || { s1_in: 0, s1_tot: 0, s2_in: 0, s2_tot: 0 };
         const card = document.createElement('div');
         card.className = 'serve-card';
         card.innerHTML = `
           <div class="serve-header">${p}</div>
-          <div class="serve-box">
-            <div style="font-size:11px; color:#94a3b8; font-weight:700;">1er Saque</div>
-            <div class="serve-count" id="cnt1-${p}">${basketServes[p].s1}</div>
-            <button class="btn-serve-hit" onclick="logServeHit('${p}', 1)">+ ACERTÓ</button>
-          </div>
-          <div class="serve-box">
-            <div style="font-size:11px; color:#94a3b8; font-weight:700;">2do Saque</div>
-            <div class="serve-count" id="cnt2-${p}">${basketServes[p].s2}</div>
-            <button class="btn-serve-hit" onclick="logServeHit('${p}', 2)">+ ACERTÓ</button>
+          <div class="serve-grid-blocks">
+            <div class="serve-box">
+              <div style="font-size:12px; color:#38bdf8; font-weight:800;">1er Saque</div>
+              <div class="serve-count-row" id="srv-lbl-1-${p}">
+                <span style="color:#6ee7b7">${s.s1_in}</span> / <span>${s.s1_tot}</span>
+              </div>
+              <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">(Adentro / Totales)</div>
+              <div class="serve-btn-pair">
+                <button class="btn-srv-in" onclick="logServeClick('${p}', 1, true)">+ Adentro</button>
+                <button class="btn-srv-out" onclick="logServeClick('${p}', 1, false)">+ Falla</button>
+              </div>
+            </div>
+
+            <div class="serve-box">
+              <div style="font-size:12px; color:#38bdf8; font-weight:800;">2do Saque</div>
+              <div class="serve-count-row" id="srv-lbl-2-${p}">
+                <span style="color:#6ee7b7">${s.s2_in}</span> / <span>${s.s2_tot}</span>
+              </div>
+              <div style="font-size:10px; color:#94a3b8; margin-bottom:4px;">(Adentro / Totales)</div>
+              <div class="serve-btn-pair">
+                <button class="btn-srv-in" onclick="logServeClick('${p}', 2, true)">+ Adentro</button>
+                <button class="btn-srv-out" onclick="logServeClick('${p}', 2, false)">+ Falla</button>
+              </div>
+            </div>
           </div>
         `;
         list.appendChild(card);
       });
-
-      updateStatus();
     }
 
     function switchTab(t) {
@@ -265,15 +327,42 @@
         ZonaFalla: zona
       });
       updateStatus();
+      updateActionBadges();
     }
 
-    function logServeHit(player, type) {
+    // Actualiza los numeritos dentro de los botones para el alumno seleccionado
+    function updateActionBadges() {
+      const counts = {};
+      matchLogs.forEach(r => {
+        if (r.Alumno === activePlayer) {
+          const key = `badge-${r.Golpe}-${r.Resultado}-${r.ZonaFalla}`;
+          counts[key] = (counts[key] || 0) + 1;
+        }
+      });
+
+      document.querySelectorAll('.badge-count').forEach(badge => {
+        badge.innerText = counts[badge.id] || 0;
+      });
+    }
+
+    // Maneja los clics de saques (+1 adentro y total, o +1 solo a total si falla)
+    function logServeClick(player, type, isInside) {
+      if (!basketServes[player]) basketServes[player] = { s1_in: 0, s1_tot: 0, s2_in: 0, s2_tot: 0 };
+      
       if (type === 1) {
-        basketServes[player].s1++;
-        document.getElementById(`cnt1-${player}`).innerText = basketServes[player].s1;
+        basketServes[player].s1_tot++;
+        if (isInside) basketServes[player].s1_in++;
+        const lbl = document.getElementById(`srv-lbl-1-${player}`);
+        if (lbl) {
+          lbl.innerHTML = `<span style="color:#6ee7b7">${basketServes[player].s1_in}</span> / <span>${basketServes[player].s1_tot}</span>`;
+        }
       } else {
-        basketServes[player].s2++;
-        document.getElementById(`cnt2-${player}`).innerText = basketServes[player].s2;
+        basketServes[player].s2_tot++;
+        if (isInside) basketServes[player].s2_in++;
+        const lbl = document.getElementById(`srv-lbl-2-${player}`);
+        if (lbl) {
+          lbl.innerHTML = `<span style="color:#6ee7b7">${basketServes[player].s2_in}</span> / <span>${basketServes[player].s2_tot}</span>`;
+        }
       }
     }
 
@@ -297,6 +386,7 @@
         const removed = matchLogs.pop();
         showToast(`↩ Deshecho: ${removed.Alumno} (${removed.Golpe})`);
         updateStatus();
+        updateActionBadges();
       } else {
         showToast("En saques podés reiniciar con Borrar");
       }
@@ -310,12 +400,12 @@
         : `Total sesión: ${total}`;
     }
 
-    // EXPORTACIÓN UNIFICADA: Todo en un solo archivo CSV
+    // EXPORTACIÓN UNIFICADA: Respeta 100% el formato para Power BI
     function exportFullSession(resetAfter = false) {
       const totalPoints = matchLogs.length;
       let hasServes = false;
       players.forEach(p => {
-        if (basketServes[p] && (basketServes[p].s1 > 0 || basketServes[p].s2 > 0)) {
+        if (basketServes[p] && (basketServes[p].s1_tot > 0 || basketServes[p].s2_tot > 0)) {
           hasServes = true;
         }
       });
@@ -338,22 +428,20 @@
       csv += "TABLA CANASTO DE SAQUE\r\n";
       csv += "Alumno;Fecha;Tipo de saque;Tiros totales;Tiros adentro\r\n";
       
-      const attempts = document.getElementById('serveTargetInput').value || 10;
       players.forEach(p => {
-        const s1 = (basketServes[p] && basketServes[p].s1) ? basketServes[p].s1 : 0;
-        const s2 = (basketServes[p] && basketServes[p].s2) ? basketServes[p].s2 : 0;
-        csv += `"${p}";"${todayStr()}";"1er Saque";${attempts};${s1}\r\n`;
-        csv += `"${p}";"${todayStr()}";"2do Saque";${attempts};${s2}\r\n`;
+        const s = basketServes[p] || { s1_in: 0, s1_tot: 0, s2_in: 0, s2_tot: 0 };
+        // Escribe exactamente la estructura que procesa Power BI
+        csv += `"${p}";"${todayStr()}";"1er Saque";${s.s1_tot};${s.s1_in}\r\n`;
+        csv += `"${p}";"${todayStr()}";"2do Saque";${s.s2_tot};${s.s2_in}\r\n`;
       });
 
-      // Nombre estandarizado de archivo
       const studentTag = players.length === 1 ? players[0] : "Sesion";
       const fileName = `tenis_${studentTag}_${Date.now()}.csv`;
       triggerDownload(csv, fileName);
 
       if (resetAfter) {
         matchLogs = [];
-        players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
+        players.forEach(p => { basketServes[p] = { s1_in: 0, s1_tot: 0, s2_in: 0, s2_tot: 0 }; });
         renderApp();
         showToast("💾 Sesión guardada y reiniciada");
       } else {
@@ -374,7 +462,7 @@
     function clearData() {
       if (!confirm("¿Deseas reiniciar todos los datos (puntos y saques) sin guardar?")) return;
       matchLogs = [];
-      players.forEach(p => { basketServes[p] = { s1: 0, s2: 0 }; });
+      players.forEach(p => { basketServes[p] = { s1_in: 0, s1_tot: 0, s2_in: 0, s2_tot: 0 }; });
       renderApp();
       showToast("Datos reiniciados");
     }
